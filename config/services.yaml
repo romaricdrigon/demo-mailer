@@ -1,9 +1,5 @@
-# This file is the entry point to configure your own services.
-# Files in the packages/ subdirectory configure your dependencies.
-
-# Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+    MAILER_DSN: "%env(MAILER_DSN)%" # To suppress warning about variable never used
 
 services:
     # default configuration for services in *this* file
@@ -25,3 +21,12 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    mailer.default_transport:
+        class: App\Email\FileTransport
+        arguments:
+            # We have to re-inject event_dispatcher, otherwise we will get a "detached" event_dispatcher
+            - '@event_dispatcher'
+        calls:
+            - method: 'setProjectDir'
+              arguments: [ "%kernel.project_dir%" ]
